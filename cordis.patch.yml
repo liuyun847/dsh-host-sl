@@ -1,0 +1,35 @@
+# dsh-host-sl 的 profile 层 patch（包内自带）。
+#
+# 本包是"组合包"(bundle)：宿主按 profile 的 dsh.profile.bundles 加载本包时应用本文件。
+#
+# ── 三处装载入口，缺一不可（照 dsh-skill-toggle / dsh-host-task-board 的实测结论）──
+#   1. 本文件（包内 cordis.patch.yml）：提供下面这条 insert 行；
+#   2. 包 package.json 的 dsh.bundle.patch 指向 ./cordis.patch.yml，且 files 白名单要含它
+#      —— pnpm 的 file: 拷贝**只按 files 落文件**，漏了就是"包内没有 patch 文件"；
+#   3. profile package.json 的 dsh.profile.bundles 里要有包名 dsh-host-sl。
+#   少任何一处：要么整包不被选中(3)，要么整包被静默跳过(1、2)——loadProfileDirectory 把失败
+#   收进 skippedBundles，不报错、热重载路径连日志都没有。
+#
+# ── 本包在 profile 里以 link: 装载（PLAN §4）────────────────────────────────
+#   node_modules\dsh-host-sl 是指向工作区 <工作区>\dsh\dsh-host-sl 的
+#   **Junction**：工作区那份是唯一源，改了立即生效（不用 remove/add 同步运行副本）。
+#   ⚠ 代价：Node 按 realpath 解析模块 ⇒ 裸 import 宿主包（@deepseek-ai/dsh-llm 等）会
+#   ERR_MODULE_NOT_FOUND。本包因此**一个宿主包都不 import**（只用 node:* 与相对路径），
+#   工具 schema 与注入消息都自己造，形状由 test/message-shape.test.mjs 对着真实宿主工厂钉住。
+#   实测记录见 README「为什么一个宿主包都不 import」。
+#
+# ── 启停与生效 ─────────────────────────────────────────────────────────────
+#   启停：插件页「已安装」卡片的总开关（写 profile 的 dsh.profile.bundles），
+#   或卡片详情里的行级开关（向 profile 的 cordis.patch.yml 写 disabled 覆盖）。
+#   行 id `sl-handoff` 是上述开关与 settings 命名空间的寻址键，**勿改**。
+#   改**本文件**不会热生效（dsh-hmr 只盯 profile 的 cordis.patch.yml、$DSH_HOME\cordis.patch.yml
+#   与 profile package.json）；改 lib/*.js 一律要重启 dsh（模块按 URL 缓存）。
+#
+# ── 回滚 ──────────────────────────────────────────────────────────────────
+#   删掉下面这条 insert（热卸载）+ 把包名从 profile 的 dsh.profile.bundles 移除：
+#     node <工作区>\dsh\dsh-plugin-manager\dshpm.mjs remove dsh-host-sl --profile web
+#   再删数据目录 ~\.dsh\storages\sl-handoff\（交接记录 + 待续标记 + 日志都在里面）。
+#   本插件不改任何 profile 文件、不写用户工作区、不留后台任务，卸载后没有残留。
+- insert:
+    - id: sl-handoff
+      name: 'dsh-host-sl'

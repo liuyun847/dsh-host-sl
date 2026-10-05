@@ -1,0 +1,38 @@
+{
+  "name": "dsh-host-sl",
+  "version": "0.7.4",
+  "private": true,
+  "description": "DSH 宿主插件：实时维护「谁有没做完的事」活跃工作表（active-sessions.json），dsh 崩溃或重启后自动冷恢复唤醒那些会话并附上断点信息（在跑的子代理/未结算作业）；注入文案改为固定首句 `sl已接续会话,继续`—— 判据优先用宿主 workspace/session-activity（turn/job/subagent/schedule），goal 单独查；事件驱动实时更新（agent/status、goal/activation-changed、jobs.events + 周期兜底），唤醒成功后移除条目；子代理全部试完后按父会话汇总一条「子代理接续结果」通知（成功/失败/未尝试都报），父会话在跑且 next-turn 已清空时用 steer 插队（同轮可见）、其余 followup 排队；先冷唤醒父会话再试子代理（自己有条目的父会话不裸唤醒）；对外只保留 cordis 服务 slHandoff（saveAll/pendingSummary）",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "plugin",
+    "session-resume",
+    "crash-recovery"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liuyun847/dsh-host-sl.git"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "license": "MIT"
+}
