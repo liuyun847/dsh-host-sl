@@ -3,3 +3,6 @@ node_modules/
 *.bak*
 .DS_Store
 .dsh/
+# docs 下只放行 v0.6.0 归档（⚠ 必须写 `docs/*` 而不是 `docs/`：目录模式会连目录一起排除，git 不再进入该目录，下面的 `!` 例外会静默失效）
+docs/*
+!docs/README-v0.6.0.md

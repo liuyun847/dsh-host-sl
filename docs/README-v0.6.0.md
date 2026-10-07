@@ -1,5 +1,9 @@
 # dsh-host-sl
 
+> **历史归档（v0.6.0）**：本文描述的是 v0.6.0 的「`/sl` 命令 + Markdown 交接记录 + `pending.json`」那套机制，
+> 其中的 `/sl`（及服务侧 `save` / `saveAll`）自 **v0.7.0 起已整体删除**，现行机制见仓库根 [README.md](../README.md)；
+> 文中引用的 [PLAN.md](../dsh-sl-handoff/PLAN.md) 与 [CONTRACT.md](../dsh-sl-handoff/CONTRACT.md) 是**仓库外文件**（在 GitHub 上点不开）。
+
 DSH 宿主插件：**会话任务状态跨进程保存与恢复**。
 
 结束工作时把会话渲染成交接记录落盘（人敲 `/sl`，或宿主插件调 cordis 服务 `slHandoff` 的
