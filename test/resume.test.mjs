@@ -219,19 +219,26 @@ test('buildResumeText：hasSubagentEntries 覆盖清单判据（预告与通知�
     '清单里有、但工作表里没有 ⇒ 不预告（否则"有预告没通知"）')
 })
 
-test('buildSubagentResumeText：固定首句 + 父会话 id + 先汇报状态', () => {
+test('buildSubagentResumeText：固定首句 + 父会话 id + 先汇报状态（点名 send_message）', () => {
   const text = buildSubagentResumeText(entry({ kind: KIND_SUBAGENT, parentSessionId: 'session-parent' }))
   assert.equal(text.split('\n')[0], FIXED_FIRST_LINE, '子代理版首行与顶层逐字相同')
   assert.match(text, /你是子代理，这是重启后的接续，不是父代理新派活/, '必须说清"不是父代理新派的活"')
   assert.match(text, /session-parent/, '必须写明挂在哪个父会话名下')
-  assert.match(text, /先汇报当前状态/)
+  assert.match(text, /把当前状态汇报给/, '汇报要求仍在')
   assert.match(text, /做到哪一步、哪些结论已经有了、有没有留下半成品文件/)
   assert.match(text, /不要照抄重启前的结论/)
   assert.doesNotMatch(text, /dsh 重启把你上一轮打断了/, '旧首句已删除')
 
+  // v0.7.5：汇报必须**点名工具**（光说"汇报"的话子代理会写在正文里，而父会话看不到）
+  assert.match(text, /用 `send_message` 工具把当前状态汇报给/, '汇报要指定走 send_message')
+  assert.match(text, /你在这边的正文输出它看不到/, '要说清为什么必须发过去（正文父会话看不到）')
+  assert.match(text, /发完再继续未完成的部分/, '"先汇报、后继续"的顺序不变')
+
   const noParent = buildSubagentResumeText(entry({ kind: KIND_SUBAGENT, parentSessionId: '' }))
   assert.equal(noParent.split('\n')[0], FIXED_FIRST_LINE, '没有父会话 id 时首句不变')
   assert.doesNotMatch(noParent, /你挂在父会话/)
+  assert.match(noParent, /把当前状态汇报给父会话（/, '没有父会话 id 时退成不带 id 的说法（句子仍然通顺）')
+  assert.doesNotMatch(noParent, /undefined/, '缺父会话 id 不能把 undefined 渲染进正文')
 })
 
 test('注入固定首句：顶层与子代理逐字相同（半角逗号），旧文案零残留', () => {

@@ -94,7 +94,7 @@ test('静态自检：零宿主 import（link: 装机下裸 import 会让 dsh 起
 
 test('静态自检：VERSION 与 package.json 一致', () => {
   assert.equal(VERSION, PACKAGE.version)
-  assert.equal(VERSION, '0.7.4')
+  assert.equal(VERSION, '0.7.5')
 })
 
 test('apply：配置非法时**绝不抛回 loader**，只降级并写兜底日志', () => {

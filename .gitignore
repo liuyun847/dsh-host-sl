@@ -3,4 +3,3 @@ node_modules/
 *.bak*
 .DS_Store
 .dsh/
-docs/
